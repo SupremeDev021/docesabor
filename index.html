@@ -106,25 +106,32 @@
     <div class="calc-container">
         
         <div class="insumos-area">
-            <h3>Custos / Ingredientes Usados</h3>
+            <h3>Custos / Insumos Usados</h3>
             <div class="input-group-row">
                 <input type="text" id="insumo-nome" placeholder="Ex: Embalagem, Matéria-prima...">
                 <input type="number" id="insumo-valor" placeholder="Valor (R$)" step="0.01">
-                <button type="button" onclick="adicionarInsumo()">Adicionar</button>
+                <button type="button" onclick="window.adicionarInsumo()">Adicionar</button>
             </div>
             <ul id="lista-insumos" class="lista-insumos"></ul>
         </div>
 
         <div class="input-group">
-            <label>Custo de Produção Total (Calculado Automático)</label>
+            <label>Custo de Produção TOTAL (R$)</label>
             <input type="number" id="calc-custo" value="0.00" readonly>
         </div>
-        <div class="input-group">
-            <label>Margem de Lucro Desejada (%)</label>
-            <input type="number" id="calc-margem" placeholder="Ex: 100" oninput="calcularPreco()">
+
+        <div class="input-group" style="border-left: 4px solid #38bdf8; padding-left: 10px; margin-top: 15px;">
+            <label>Rendimento (Qtd Total Produzida)</label>
+            <input type="number" id="calc-rendimento" placeholder="Ex: 10" value="1" oninput="window.calcularPreco()">
         </div>
+
+        <div class="input-group" style="margin-top: 15px;">
+            <label>Margem de Lucro Desejada (%)</label>
+            <input type="number" id="calc-margem" placeholder="Ex: 100" oninput="window.calcularPreco()">
+        </div>
+
         <div class="result-box">
-            <h3>Preço de Venda Sugerido:</h3>
+            <h3>Preço de Venda Sugerido (Por Unidade):</h3>
             <h2 id="calc-resultado">R$ 0,00</h2>
         </div>
     </div>
