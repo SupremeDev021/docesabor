@@ -78,14 +78,23 @@ function atualizarListaInsumos() {
 }
 
 window.calcularPreco = function() {
-    const custo = parseFloat(document.getElementById('calc-custo').value) || 0;
+    // 1. Pega os valores da tela
+    const custoTotal = parseFloat(document.getElementById('calc-custo').value) || 0;
+    const rendimento = parseInt(document.getElementById('calc-rendimento').value) || 1;
     const margem = parseFloat(document.getElementById('calc-margem').value) || 0;
     
-    const precoSugerido = custo + (custo * (margem / 100));
+    // 2. Impede divisão por zero se o usuário apagar o campo
+    const qtdValida = rendimento > 0 ? rendimento : 1;
+
+    // 3. Descobre o custo de apenas 1 unidade
+    const custoUnitario = custoTotal / qtdValida;
     
+    // 4. Aplica a margem de lucro em cima da unidade
+    const precoSugerido = custoUnitario + (custoUnitario * (margem / 100));
+    
+    // 5. Mostra na tela
     document.getElementById('calc-resultado').innerText = `R$ ${precoSugerido.toFixed(2)}`;
 };
-
 
 // ==========================================
 // 4. FLUXOS DO BANCO DE DADOS (SUPABASE)
