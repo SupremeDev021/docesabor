@@ -1,11 +1,9 @@
 // ==========================================
-// 1. CONFIGURAÇÃO DO SUPABASE (Corrigida)
+// 1. CONFIGURAÇÃO DO SUPABASE
 // ==========================================
-// ATENÇÃO: A URL não pode ter "/rest/v1/" no final. Foi corrigido abaixo.
 const SUPABASE_URL = "https://kfnvhqspzefdvfkgbawp.supabase.co"; 
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmbnZocXNwemVmZHZma2diYXdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwMjE3MTcsImV4cCI6MjA5NTU5NzcxN30.JOWCOAszK1W3GOklrwhKUAy_lGbuX7WGmlwAdsIvBj8";
 
-// Mudamos o nome da variável para "meuBanco" para nunca mais dar o erro de "already been declared"
 var meuBanco = null;
 
 try {
@@ -68,7 +66,7 @@ function atualizarListaInsumos() {
         lista.innerHTML += `
             <li>
                 <span>${item.nome}</span>
-                <span>R$ ${item.valor.toFixed(2)} <span class="btn-remover" onclick="removerInsumo(${item.id})">X</span></span>
+                <span>R$ ${item.valor.toFixed(2)} <span class="btn-remover" onclick="window.removerInsumo(${item.id})">X</span></span>
             </li>
         `;
     });
@@ -78,45 +76,37 @@ function atualizarListaInsumos() {
 }
 
 window.calcularPreco = function() {
-    // 1. Pega os valores de custo e rendimento
     const custoTotal = parseFloat(document.getElementById('calc-custo').value) || 0;
     const rendimento = parseInt(document.getElementById('calc-rendimento').value) || 1;
     
-    // 2. Pega as porcentagens da tela (Sem impostos)
     const despesas = parseFloat(document.getElementById('calc-despesas').value) || 0;
     const margem = parseFloat(document.getElementById('calc-margem').value) || 0;
     
-    // 3. Descobre o custo unitário (Custo / Rendimento)
     const qtdValida = rendimento > 0 ? rendimento : 1;
     const custoUnitario = custoTotal / qtdValida;
     
-    // 4. PASSO 1: Soma as porcentagens (Apenas Despesas + Lucro)
+    // Fórmula Markup: Despesas + Lucro
     const somaPorcentagens = despesas + margem;
 
     let precoSugerido = 0;
 
-    // Trava de segurança matemática do Markup
     if (somaPorcentagens >= 100) {
         document.getElementById('calc-resultado').innerText = "Erro: % >= 100";
-        return; // Interrompe o cálculo
+        return; 
     } 
     
-    // Se a soma for zero, o preço é apenas o custo unitário
     if (somaPorcentagens === 0) {
         precoSugerido = custoUnitario;
     } else {
-        // PASSO 2: Aplica na fórmula do índice de Markup
         const indice = 100 / (100 - somaPorcentagens);
-        
-        // PASSO 3: Multiplica o custo pelo índice
         precoSugerido = custoUnitario * indice;
     }
     
-    // 5. Exibe na tela formatado
     document.getElementById('calc-resultado').innerText = `R$ ${precoSugerido.toFixed(2)}`;
 };
+
 // ==========================================
-// 4. FLUXOS DO BANCO DE DADOS (SUPABASE)
+// 4. FLUXOS DO BANCO DE DADOS E FORMULÁRIOS
 // ==========================================
 
 async function fetchData() {
@@ -190,13 +180,32 @@ document.getElementById('form-venda').addEventListener('submit', async function(
     fetchData();
 });
 
-// Dar Baixa
+// Ações nas Tabelas
 window.darBaixa = async function(vendaId) {
     if(!meuBanco) return;
     await meuBanco.from('vendas').update({ status: 'Pago' }).eq('id', vendaId);
     fetchData();
 };
 
+window.alterarEstoque = async function(id, qtdAtual) {
+    let novaQtd = prompt("Digite a nova quantidade em estoque para este produto:", qtdAtual);
+    if (novaQtd !== null && novaQtd.trim() !== "") {
+        novaQtd = parseInt(novaQtd);
+        if (!isNaN(novaQtd) && novaQtd >= 0) {
+            await meuBanco.from('produtos').update({ qtd_estoque: novaQtd }).eq('id', id);
+            fetchData();
+        } else {
+            alert("Por favor, digite um número válido maior ou igual a zero.");
+        }
+    }
+};
+
+window.excluirProduto = async function(id) {
+    if (confirm("ATENÇÃO: Tem certeza que deseja excluir este produto?")) {
+        await meuBanco.from('produtos').delete().eq('id', id);
+        fetchData();
+    }
+};
 
 // ==========================================
 // 5. ATUALIZAÇÃO VISUAL (Tabelas e Dashboard)
@@ -226,24 +235,62 @@ async function renderTables() {
     tFunc.innerHTML = '';
     if(funcs) funcs.forEach(f => tFunc.innerHTML += `<tr><td>${f.id}</td><td>${f.nome}</td></tr>`);
 
-    const { data: prods } = await meuBanco.from('produtos').select('*');
+    const { data: prods } = await meuBanco.from('produtos').select('*').order('nome', { ascending: true });
     const tProd = document.querySelector('#table-produtos tbody');
     tProd.innerHTML = '';
-    if(prods) prods.forEach(p => tProd.innerHTML += `<tr><td>${p.nome}</td><td>${p.qtd_estoque}</td><td>R$ ${p.custo_producao.toFixed(2)}</td><td>R$ ${p.preco_venda.toFixed(2)}</td></tr>`);
+    if(prods) {
+        prods.forEach(p => {
+            tProd.innerHTML += `
+                <tr>
+                    <td>${p.nome}</td>
+                    <td>${p.qtd_estoque}</td>
+                    <td>R$ ${p.custo_producao.toFixed(2)}</td>
+                    <td>R$ ${p.preco_venda.toFixed(2)}</td>
+                    <td>
+                        <button class="btn-acao btn-editar" onclick="window.alterarEstoque(${p.id}, ${p.qtd_estoque})">Alterar Qtd</button>
+                        <button class="btn-acao btn-excluir" onclick="window.excluirProduto(${p.id})">Excluir</button>
+                    </td>
+                </tr>`;
+        });
+    }
 
     const { data: saidas } = await meuBanco.from('saidas').select('*, produtos(nome), funcionarios(nome)');
     const tSaidas = document.querySelector('#table-saidas tbody');
     tSaidas.innerHTML = '';
-    if(saidas) saidas.forEach(s => tSaidas.innerHTML += `<tr><td>${s.funcionarios?.nome || 'N/A'}</td><td>${s.produtos?.nome || 'N/A'}</td><td>${s.qtd_inicial}</td><td>${s.qtd_restante}</td></tr>`);
+    if(saidas) saidas.forEach(s => tSaidas.innerHTML += `<tr><td>${s.funcionarios?.nome || 'Excluído'}</td><td>${s.produtos?.nome || 'Excluído'}</td><td>${s.qtd_inicial}</td><td>${s.qtd_restante}</td></tr>`);
 
-    const { data: vendas } = await meuBanco.from('vendas').select('*, saidas(produtos(nome), funcionarios(nome))');
+    await window.renderVendas();
+}
+
+window.renderVendas = async function() {
+    const fFunc = document.getElementById('filtro-func')?.value.toLowerCase() || '';
+    const fCli = document.getElementById('filtro-cli')?.value.toLowerCase() || '';
+    const fProd = document.getElementById('filtro-prod')?.value.toLowerCase() || '';
+    const fStatus = document.getElementById('filtro-status')?.value || '';
+
+    const { data: vendas } = await meuBanco.from('vendas')
+        .select('*, saidas(produtos(nome), funcionarios(nome))')
+        .order('created_at', { ascending: false });
+
     const tVendas = document.querySelector('#table-vendas tbody');
     tVendas.innerHTML = '';
-    if(vendas) {
-        vendas.forEach(v => {
+
+    if (vendas) {
+        let filtrados = vendas.filter(v => {
+            const funcNome = (v.saidas?.funcionarios?.nome || '').toLowerCase();
+            const prodNome = (v.saidas?.produtos?.nome || '').toLowerCase();
+            const cliNome = (v.cliente || '').toLowerCase();
+
+            return (fFunc === '' || funcNome.includes(fFunc)) &&
+                   (fCli === '' || cliNome.includes(fCli)) &&
+                   (fProd === '' || prodNome.includes(fProd)) &&
+                   (fStatus === '' || v.status === fStatus);
+        });
+
+        filtrados.slice(0, 10).forEach(v => {
             const isPendente = v.status === 'Pendente';
             const statusClass = isPendente ? 'status-pendente' : 'status-pago';
-            const botaoAcao = isPendente ? `<button class="btn-baixa" onclick="darBaixa(${v.id})">Marcar Pago</button>` : 'Concluído';
+            const botaoAcao = isPendente ? `<button class="btn-baixa" onclick="window.darBaixa(${v.id})">Marcar Pago</button>` : 'Concluído';
 
             tVendas.innerHTML += `
                 <tr>
@@ -257,7 +304,7 @@ async function renderTables() {
                 </tr>`;
         });
     }
-}
+};
 
 async function renderDashboard() {
     const { data: prods } = await meuBanco.from('produtos').select('*');
@@ -266,12 +313,19 @@ async function renderDashboard() {
 
     let totalEstoque = prods ? prods.reduce((acc, p) => acc + p.qtd_estoque, 0) : 0;
     let totalNaRua = saidas ? saidas.reduce((acc, s) => acc + s.qtd_restante, 0) : 0;
+    
     let receita = 0;
     let gastos = 0;
+    let pendenteRua = 0; 
 
     if (vendas) {
         vendas.forEach(v => {
-            if (v.status === 'Pago') receita += parseFloat(v.total);
+            if (v.status === 'Pago') {
+                receita += parseFloat(v.total);
+            } else if (v.status === 'Pendente') {
+                pendenteRua += parseFloat(v.total);
+            }
+            
             const custoUnitario = parseFloat(v.saidas?.produtos?.custo_producao || 0);
             gastos += (v.qtd * custoUnitario);
         });
@@ -282,6 +336,7 @@ async function renderDashboard() {
     document.getElementById('dash-estoque').innerText = totalEstoque;
     document.getElementById('dash-rua').innerText = totalNaRua;
     document.getElementById('dash-receita').innerText = `R$ ${receita.toFixed(2)}`;
+    document.getElementById('dash-pendente').innerText = `R$ ${pendenteRua.toFixed(2)}`;
     document.getElementById('dash-gastos').innerText = `R$ ${gastos.toFixed(2)}`;
     document.getElementById('dash-lucro').innerText = `R$ ${lucro.toFixed(2)}`;
 
