@@ -3,20 +3,20 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Poppins', sans-serif; /* Fonte moderna */
+    font-family: 'Poppins', sans-serif;
 }
 
 body {
     display: flex;
     height: 100vh;
-    background-color: #fffafb; /* Fundo bem claro puxado pro rosa */
+    background-color: #fffafb; 
     color: #334155;
 }
 
 /* ================== SIDEBAR ================== */
 .sidebar {
     width: 260px;
-    background-color: #be123c; /* Rosa Escuro / Vermelho Cereja */
+    background-color: #be123c; 
     color: white;
     padding: 30px 0;
     box-shadow: 4px 0 15px rgba(0,0,0,0.1);
@@ -29,7 +29,7 @@ body {
     font-size: 22px;
     font-weight: 700;
     letter-spacing: 1px;
-    color: #fde047; /* Amarelo no Título */
+    color: #fde047; 
 }
 
 .sidebar ul {
@@ -45,8 +45,8 @@ body {
 }
 
 .sidebar ul li:hover, .sidebar ul li.active {
-    background-color: #9f1239; /* Hover mais escuro */
-    border-left: 4px solid #facc15; /* Detalhe Amarelo Vibrante */
+    background-color: #9f1239; 
+    border-left: 4px solid #facc15; 
     color: #fef08a;
 }
 
@@ -75,7 +75,7 @@ h1 {
     font-size: 28px;
     font-weight: 700;
     margin-bottom: 25px;
-    color: #be123c; /* Títulos em Rosa Escuro */
+    color: #be123c;
 }
 
 h2 {
@@ -95,9 +95,9 @@ h2 {
 .card {
     background: white;
     padding: 25px;
-    border-radius: 12px; /* Mais arredondado */
+    border-radius: 12px; 
     flex: 1;
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); /* Sombra suave moderna */
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); 
     border: 1px solid #f1f5f9;
     transition: transform 0.2s ease;
 }
@@ -120,12 +120,11 @@ h2 {
     color: #1e293b;
 }
 
-/* Paleta de Cores dos Cards */
-.bg-receita { border-bottom: 5px solid #fb7185; } /* Rosa */
-.bg-pendente { border-bottom: 5px solid #facc15; } /* Amarelo */
-.bg-gastos { border-bottom: 5px solid #ef4444; } /* Vermelho */
+.bg-receita { border-bottom: 5px solid #fb7185; } 
+.bg-pendente { border-bottom: 5px solid #facc15; } 
+.bg-gastos { border-bottom: 5px solid #ef4444; } 
 .bg-lucro { 
-    background: linear-gradient(135deg, #be123c, #fb7185); /* Gradiente Rosa/Vermelho */
+    background: linear-gradient(135deg, #be123c, #fb7185); 
     color: white;
 }
 .bg-lucro h3, .bg-lucro p { color: white; }
@@ -161,10 +160,9 @@ input:focus, select:focus {
     box-shadow: 0 0 0 3px rgba(251, 113, 133, 0.2);
 }
 
-/* Botão Principal (Rosa) */
 button {
     padding: 14px 28px;
-    background-color: #e11d48; /* Vermelho/Rosa vibrante */
+    background-color: #e11d48; 
     color: white;
     border: none;
     border-radius: 8px;
@@ -174,12 +172,8 @@ button {
     transition: background-color 0.2s, transform 0.1s;
 }
 
-button:hover {
-    background-color: #be123c;
-}
-button:active {
-    transform: scale(0.98);
-}
+button:hover { background-color: #be123c; }
+button:active { transform: scale(0.98); }
 
 /* ================== TABELAS ================== */
 table {
@@ -200,37 +194,22 @@ th, td {
 }
 
 th {
-    background-color: #fff1f2; /* Fundo Rosa Bem Claro */
+    background-color: #fff1f2; 
     color: #be123c;
     font-weight: 600;
 }
 
-tr:hover {
-    background-color: #fdf2f8; /* Efeito hover na linha (rosa claro) */
-}
+tr:hover { background-color: #fdf2f8; }
 
-/* Status Badges */
 .status-pago { background: #dcfce7; color: #166534; padding: 6px 12px; border-radius: 20px; font-weight: 600; }
 .status-pendente { background: #fef08a; color: #854d0e; padding: 6px 12px; border-radius: 20px; font-weight: 600; }
 
-/* Botões da Tabela */
-.btn-baixa {
-    background-color: #facc15;
-    color: #422006;
-    padding: 8px 14px;
-    font-size: 12px;
-}
+.btn-baixa { background-color: #facc15; color: #422006; padding: 8px 14px; font-size: 12px; }
 .btn-baixa:hover { background-color: #eab308; }
 
-.btn-acao {
-    padding: 8px 12px;
-    margin-right: 5px;
-    font-size: 12px;
-    border-radius: 6px;
-}
+.btn-acao { padding: 8px 12px; margin-right: 5px; font-size: 12px; border-radius: 6px; }
 .btn-editar { background-color: #facc15; color: #422006; }
 .btn-editar:hover { background-color: #eab308; }
-
 .btn-excluir { background-color: #ef4444; }
 .btn-excluir:hover { background-color: #dc2626; }
 
@@ -244,38 +223,24 @@ tr:hover {
     border: 1px solid #f1f5f9;
 }
 
-.dica-calc {
-    font-size: 13px; 
-    color: #64748b; 
-    margin-bottom: 15px;
-    line-height: 1.5;
-}
-
-.input-group {
-    display: flex;
-    flex-direction: column;
-}
+.dica-calc { font-size: 13px; color: #64748b; margin-bottom: 15px; line-height: 1.5; }
+.input-group { display: flex; flex-direction: column; }
 .mt-3 { margin-top: 20px; }
 
 .highlight-group {
     margin-top: 20px;
-    border-left: 4px solid #facc15; /* Detalhe Amarelo */
+    border-left: 4px solid #facc15; 
     padding-left: 15px;
     background: #fefce8;
     padding: 15px;
     border-radius: 0 8px 8px 0;
 }
 
-.input-group label {
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #334155;
-    font-size: 14px;
-}
+.input-group label { margin-bottom: 8px; font-weight: 600; color: #334155; font-size: 14px; }
 
 .result-box {
     margin-top: 30px;
-    background: #fff1f2; /* Fundo Rosa Claro */
+    background: #fff1f2; 
     padding: 20px;
     border-radius: 8px;
     text-align: center;
@@ -285,48 +250,48 @@ tr:hover {
 .result-box h3 { color: #be123c; font-size: 16px; margin-bottom: 5px;}
 .result-box h2 { color: #e11d48; font-size: 32px; font-weight: 700; margin: 0;}
 
-.insumos-area {
-    margin-bottom: 25px;
-    padding-bottom: 25px;
-    border-bottom: 2px solid #f1f5f9;
-}
-
-.input-group-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
+.insumos-area { margin-bottom: 25px; padding-bottom: 25px; border-bottom: 2px solid #f1f5f9; }
+.input-group-row { display: flex; gap: 10px; margin-bottom: 15px; }
 .btn-yellow { background-color: #facc15; color: #422006; }
 .btn-yellow:hover { background-color: #eab308; }
 
-.lista-insumos {
-    list-style: none;
-    background: #f8fafc;
-    padding: 15px;
-    border-radius: 8px;
-}
-
+.lista-insumos { list-style: none; background: #f8fafc; padding: 15px; border-radius: 8px; }
 .lista-insumos li {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid #e2e8f0;
-    font-size: 14px;
-    font-weight: 500;
+    display: flex; justify-content: space-between; padding: 10px 0;
+    border-bottom: 1px solid #e2e8f0; font-size: 14px; font-weight: 500;
 }
 .lista-insumos li:last-child { border-bottom: none; }
 .btn-remover { color: #ef4444; cursor: pointer; font-weight: bold; margin-left: 15px; padding: 2px 5px;}
 
-/* Filtros da aba de Vendas */
 .filtros-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 20px;
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-    border: 1px solid #f1f5f9;
+    display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;
+    background: white; padding: 20px; border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;
 }
+
+/* ================== MODAL DO SISTEMA (CUSTOM ALERTS) ================== */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; z-index: 9999;
+}
+.modal-overlay.active { display: flex; animation: fadeIn 0.2s ease-in-out; }
+
+.sys-modal {
+    background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px;
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); text-align: center;
+    border-top: 6px solid #e11d48;
+}
+
+.sys-modal h3 { color: #be123c; font-size: 22px; margin-bottom: 10px; }
+.sys-modal p { color: #475569; font-size: 15px; margin-bottom: 25px; line-height: 1.5; }
+
+.modal-input { margin-bottom: 20px; width: 100%; }
+
+.modal-buttons { display: flex; gap: 15px; justify-content: center; }
+
+.btn-modal-cancel { background: #f1f5f9; color: #475569; }
+.btn-modal-cancel:hover { background: #e2e8f0; }
+
+.btn-modal-confirm { background: #e11d48; color: white; flex: 1;}
+.btn-modal-confirm:hover { background: #be123c; }
