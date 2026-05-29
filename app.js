@@ -1,27 +1,50 @@
-// Configurações do Supabase - INSIRA SEUS DADOS AQUI
-const SUPABASE_URL = "SUA_URL_AQUI";
-const SUPABASE_ANON_KEY = "SUA_CHAVE_AQUI";
-
-// Trava de segurança para evitar o erro "Identifier has already been declared"
-if (!window.supabaseClient && window.supabase) {
-    window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-}
-const supabase = window.supabaseClient;
-
-// Controle de Navegação de Abas
-function showTab(tabId) {
+// ==========================================
+// 1. NAVEGAÇÃO DE ABAS (Protegida)
+// Colocamos no topo para garantir que funcione
+// mesmo se o banco de dados falhar.
+// ==========================================
+window.showTab = function(tabId) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.sidebar li').forEach(li => li.classList.remove('active'));
     
     document.getElementById(tabId).classList.add('active');
     document.getElementById(`nav-${tabId}`).classList.add('active');
-    fetchData();
+    
+    // Tenta puxar os dados, se a função existir
+    if (typeof fetchData === 'function') {
+        fetchData();
+    }
+};
+
+// ==========================================
+// 2. CONFIGURAÇÃO DO SUPABASE (Com trava anti-crash)
+// ==========================================
+const SUPABASE_URL = "SUA_URL_AQUI"; // Lembre-se de colocar o https://...
+const SUPABASE_ANON_KEY = "SUA_CHAVE_AQUI";
+
+let supabase = null;
+
+try {
+    // Só tenta conectar se a URL for válida (começar com http)
+    if (SUPABASE_URL.startsWith('http')) {
+        if (!window.supabaseClient && window.supabase) {
+            window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+        supabase = window.supabaseClient;
+    } else {
+        console.warn("⚠️ Supabase não conectado: Insira uma URL válida começando com https://");
+    }
+} catch (erro) {
+    console.error("Erro ao iniciar o banco de dados:", erro);
 }
 
-// --- LÓGICA DA CALCULADORA INTELIGENTE ---
-let insumos = []; // Memória temporária dos itens adicionados
 
-function adicionarInsumo() {
+// ==========================================
+// 3. LÓGICA DA CALCULADORA INTELIGENTE
+// ==========================================
+let insumos = []; 
+
+window.adicionarInsumo = function() {
     const nomeInput = document.getElementById('insumo-nome');
     const valorInput = document.getElementById('insumo-valor');
     const nome = nomeInput.value.trim() || 'Item sem nome';
@@ -29,20 +52,18 @@ function adicionarInsumo() {
 
     if (isNaN(valor) || valor <= 0) return alert('Insira um valor válido para o item!');
 
-    // Adiciona na lista
     insumos.push({ id: Date.now(), nome, valor });
     
-    // Limpa os campos para o próximo item
     nomeInput.value = '';
     valorInput.value = '';
     
     atualizarListaInsumos();
-}
+};
 
-function removerInsumo(id) {
+window.removerInsumo = function(id) {
     insumos = insumos.filter(item => item.id !== id);
     atualizarListaInsumos();
-}
+};
 
 function atualizarListaInsumos() {
     const lista = document.getElementById('lista-insumos');
@@ -60,24 +81,26 @@ function atualizarListaInsumos() {
         `;
     });
 
-    // Joga a soma total para o campo readonly de custo
     document.getElementById('calc-custo').value = custoTotal.toFixed(2);
-    calcularPreco(); // Recalcula o preço de venda automaticamente
+    calcularPreco(); 
 }
 
-function calcularPreco() {
+window.calcularPreco = function() {
     const custo = parseFloat(document.getElementById('calc-custo').value) || 0;
     const margem = parseFloat(document.getElementById('calc-margem').value) || 0;
     
     const precoSugerido = custo + (custo * (margem / 100));
     
     document.getElementById('calc-resultado').innerText = `R$ ${precoSugerido.toFixed(2)}`;
-}
+};
 
-// --- CHAMADAS E FLUXOS DO BANCO DE DADOS (SUPABASE) ---
+
+// ==========================================
+// 4. FLUXOS DO BANCO DE DADOS (SUPABASE)
+// ==========================================
 
 async function fetchData() {
-    if (!supabase) return;
+    if (!supabase) return; // Se não tiver banco configurado, ele para aqui e não quebra o site
     await renderSelects();
     await renderTables();
     await renderDashboard();
@@ -86,6 +109,7 @@ async function fetchData() {
 // Cadastrar Funcionário
 document.getElementById('form-funcionario').addEventListener('submit', async function(e) {
     e.preventDefault();
+    if(!supabase) return alert("Configure as chaves do Supabase no app.js");
     const nome = document.getElementById('func-nome').value;
     
     await supabase.from('funcionarios').insert([{ nome }]);
@@ -96,6 +120,7 @@ document.getElementById('form-funcionario').addEventListener('submit', async fun
 // Cadastrar Produto
 document.getElementById('form-produto').addEventListener('submit', async function(e) {
     e.preventDefault();
+    if(!supabase) return alert("Configure as chaves do Supabase no app.js");
     const nome = document.getElementById('prod-nome').value;
     const qtd_estoque = parseInt(document.getElementById('prod-qtd').value);
     const custo_producao = parseFloat(document.getElementById('prod-custo').value);
@@ -109,6 +134,7 @@ document.getElementById('form-produto').addEventListener('submit', async functio
 // Registrar Saída para a Rua
 document.getElementById('form-saida').addEventListener('submit', async function(e) {
     e.preventDefault();
+    if(!supabase) return alert("Configure as chaves do Supabase no app.js");
     const produto_id = parseInt(document.getElementById('saida-produto').value);
     const funcionario_id = parseInt(document.getElementById('saida-func').value);
     const qtd = parseInt(document.getElementById('saida-qtd').value);
@@ -126,6 +152,7 @@ document.getElementById('form-saida').addEventListener('submit', async function(
 // Registrar Venda
 document.getElementById('form-venda').addEventListener('submit', async function(e) {
     e.preventDefault();
+    if(!supabase) return alert("Configure as chaves do Supabase no app.js");
     const saida_id = parseInt(document.getElementById('venda-saida').value);
     const qtd = parseInt(document.getElementById('venda-qtd').value);
     const cliente = document.getElementById('venda-cliente').value;
@@ -144,12 +171,16 @@ document.getElementById('form-venda').addEventListener('submit', async function(
 });
 
 // Dar Baixa
-async function darBaixa(vendaId) {
+window.darBaixa = async function(vendaId) {
+    if(!supabase) return;
     await supabase.from('vendas').update({ status: 'Pago' }).eq('id', vendaId);
     fetchData();
-}
+};
 
-// --- ATUALIZAÇÃO VISUAL (Tabelas e Dashboard) ---
+
+// ==========================================
+// 5. ATUALIZAÇÃO VISUAL (Tabelas e Dashboard)
+// ==========================================
 
 async function renderSelects() {
     const { data: prods } = await supabase.from('produtos').select('*');
@@ -243,5 +274,5 @@ async function renderDashboard() {
     }
 }
 
-// Inicializa a coleta de dados
+// Inicializa a coleta de dados apenas se o banco estiver ok
 if(supabase) fetchData();
