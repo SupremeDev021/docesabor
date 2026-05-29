@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Controle</title>
+    <title>Sistema de Controle SAAS</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div class="sidebar">
-        <h2>Controle</h2>
+        <h2>Controle Real</h2>
         <ul>
             <li onclick="showTab('dashboard')" class="active" id="nav-dashboard">Dashboard</li>
+            <li onclick="showTab('funcionarios')" id="nav-funcionarios">Funcionários</li>
             <li onclick="showTab('produtos')" id="nav-produtos">Produtos</li>
+            <li onclick="showTab('precificacao')" id="nav-precificacao">Calculadora %</li>
             <li onclick="showTab('saidas')" id="nav-saidas">Saídas p/ Rua</li>
             <li onclick="showTab('vendas')" id="nav-vendas">Vendas</li>
         </ul>
@@ -19,32 +22,56 @@
 
     <div class="main-content">
         <div id="dashboard" class="tab-content active">
-            <h1>Dashboard</h1>
+            <h1>Dashboard Financeiro e Operacional</h1>
             <div class="cards">
-                <div class="card">
-                    <h3>Total em Estoque</h3>
-                    <p id="dash-estoque">0</p>
+                <div class="card bg-receita">
+                    <h3>Receita (Vendas Pagas)</h3>
+                    <p id="dash-receita">R$ 0,00</p>
                 </div>
+                <div class="card bg-gastos">
+                    <h3>Gastos (Custo do Vendido)</h3>
+                    <p id="dash-gastos">R$ 0,00</p>
+                </div>
+                <div class="card bg-lucro">
+                    <h3>Lucro Estimado</h3>
+                    <p id="dash-lucro">R$ 0,00</p>
+                </div>
+            </div>
+            <div class="cards">
                 <div class="card">
                     <h3>Produtos na Rua</h3>
                     <p id="dash-rua">0</p>
                 </div>
                 <div class="card">
-                    <h3>Total de Vendas</h3>
-                    <p id="dash-vendas">0</p>
-                </div>
-                <div class="card">
-                    <h3>Receita (Paga)</h3>
-                    <p id="dash-receita">R$ 0,00</p>
+                    <h3>Estoque Interno</h3>
+                    <p id="dash-estoque">0</p>
                 </div>
             </div>
-            <h2>Status: Produtos na Rua</h2>
+            <h2>Status Atual: Quem está na rua</h2>
             <table id="table-dash-rua">
                 <thead>
                     <tr>
                         <th>Funcionário</th>
                         <th>Produto</th>
-                        <th>Qtd Restante</th>
+                        <th>Quantidade com Ele</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="funcionarios" class="tab-content">
+            <h1>Cadastrar Funcionário</h1>
+            <form id="form-funcionario">
+                <input type="text" id="func-nome" placeholder="Nome Completo do Funcionário" required>
+                <button type="submit">Cadastrar Funcionário</button>
+            </form>
+            <h2>Funcionários Ativos</h2>
+            <table id="table-funcionarios">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -55,39 +82,59 @@
             <h1>Cadastrar Produto</h1>
             <form id="form-produto">
                 <input type="text" id="prod-nome" placeholder="Nome do Produto" required>
-                <input type="number" id="prod-qtd" placeholder="Quantidade Produzida" required>
-                <input type="number" id="prod-preco" placeholder="Preço (R$)" step="0.01" required>
-                <button type="submit">Cadastrar</button>
+                <input type="number" id="prod-qtd" placeholder="Quantidade em Estoque" required>
+                <input type="number" id="prod-custo" placeholder="Custo de Produção (R$)" step="0.01" required>
+                <input type="number" id="prod-preco" placeholder="Preço de Venda (R$)" step="0.01" required>
+                <button type="submit">Salvar Produto</button>
             </form>
-            <h2>Estoque Atual</h2>
+            <h2>Estoque Físico</h2>
             <table id="table-produtos">
                 <thead>
                     <tr>
                         <th>Produto</th>
-                        <th>Qtd Disponível</th>
-                        <th>Preço</th>
+                        <th>Qtd Disp.</th>
+                        <th>Custo Unit.</th>
+                        <th>Preço Venda</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
 
+        <div id="precificacao" class="tab-content">
+            <h1>Calculadora Inteligente de Margem</h1>
+            <div class="calc-container">
+                <div class="input-group">
+                    <label>Custo de Produção Total (R$)</label>
+                    <input type="number" id="calc-custo" placeholder="Ex: 10.00" step="0.01" oninput="calcularPreco()">
+                </div>
+                <div class="input-group">
+                    <label>Margem de Lucro Desejada (%)</label>
+                    <input type="number" id="calc-margem" placeholder="Ex: 100" oninput="calcularPreco()">
+                </div>
+                <div class="result-box">
+                    <h3>Preço de Venda Sugerido:</h3>
+                    <h2 id="calc-resultado">R$ 0,00</h2>
+                </div>
+            </div>
+        </div>
+
         <div id="saidas" class="tab-content">
-            <h1>Registrar Saída (Para a Rua)</h1>
+            <h1>Registrar Saída para a Rua</h1>
             <form id="form-saida">
-                <select id="saida-produto" required></select>
-                <input type="number" id="saida-qtd" placeholder="Quantidade" required>
-                <input type="text" id="saida-func" placeholder="Nome do Funcionário" required>
-                <button type="submit">Registrar Saída</button>
+                <select id="saida-produto" required><option value="">Carregando produtos...</option></select>
+                <select id="saida-func" required><option value="">Carregando funcionários...</option></select>
+                <input type="number" id="saida-qtd" placeholder="Quantidade Levada" required>
+                <button type="submit">Liberar para a Rua</button>
             </form>
             <h2>Histórico de Saídas</h2>
             <table id="table-saidas">
                 <thead>
                     <tr>
-                        <th>Data</th>
                         <th>Funcionário</th>
                         <th>Produto</th>
                         <th>Qtd Inicial</th>
+                        <th>Qtd Atual na Rua</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -95,29 +142,28 @@
         </div>
 
         <div id="vendas" class="tab-content">
-            <h1>Registrar Venda</h1>
+            <h1>Registrar Nova Venda da Rua</h1>
             <form id="form-venda">
-                <select id="venda-saida" required>
-                    <option value="">Selecione o Lote na Rua...</option>
-                </select>
+                <select id="venda-saida" required><option value="">Selecione o Funcionário e o Produto...</option></select>
                 <input type="number" id="venda-qtd" placeholder="Quantidade Vendida" required>
-                <input type="text" id="venda-cliente" placeholder="Para quem vendeu" required>
+                <input type="text" id="venda-cliente" placeholder="Nome do Cliente" required>
                 <select id="venda-status" required>
-                    <option value="Pago">Pago</option>
                     <option value="Pendente">Pendente</option>
+                    <option value="Pago">Pago</option>
                 </select>
-                <button type="submit">Vender</button>
+                <button type="submit">Confirmar Venda</button>
             </form>
-            <h2>Histórico de Vendas</h2>
+            <h2>Fluxo de Vendas e Baixas</h2>
             <table id="table-vendas">
                 <thead>
                     <tr>
                         <th>Funcionário</th>
-                        <th>Cliente</th>
                         <th>Produto</th>
+                        <th>Cliente</th>
                         <th>Qtd</th>
                         <th>Total</th>
                         <th>Status</th>
+                        <th>Ação</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
