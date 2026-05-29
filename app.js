@@ -190,7 +190,8 @@ document.getElementById('form-cliente').addEventListener('submit', async functio
     e.preventDefault();
     if(!meuBanco) { await SysModal.alert("Banco de dados não conectado."); return; }
     const nome = document.getElementById('cli-nome').value;
-    const telefone = document.getElementById('cli-telefone').value;
+    // Pega o telefone ou envia um texto vazio
+    const telefone = document.getElementById('cli-telefone').value || ""; 
 
     await meuBanco.from('clientes').insert([{ nome, telefone }]);
     this.reset();
