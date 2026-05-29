@@ -295,3 +295,120 @@ tr:hover { background-color: #fdf2f8; }
 
 .btn-modal-confirm { background: #e11d48; color: white; flex: 1;}
 .btn-modal-confirm:hover { background: #be123c; }
+/* ================== RESPONSIVIDADE (MOBILE E TABLETS) ================== */
+@media (max-width: 768px) {
+    /* Muda o layout principal para coluna (topo para baixo) */
+    body {
+        flex-direction: column;
+    }
+
+    /* Transforma a barra lateral em um menu superior rolável */
+    .sidebar {
+        width: 100%;
+        padding: 15px 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        z-index: 20;
+    }
+
+    .sidebar h2 {
+        margin-bottom: 15px;
+        font-size: 18px;
+    }
+
+    .sidebar ul {
+        display: flex;
+        overflow-x: auto; /* Permite rolar os botões com o dedo */
+        white-space: nowrap; /* Impede que os botões quebrem de linha */
+        padding-bottom: 5px;
+        scrollbar-width: none; /* Oculta a barra de rolagem no Firefox */
+    }
+    
+    .sidebar ul::-webkit-scrollbar {
+        display: none; /* Oculta a barra de rolagem no Chrome/Safari mobile */
+    }
+
+    .sidebar ul li {
+        padding: 10px 15px;
+        border-left: none; /* Remove o detalhe lateral */
+        border-bottom: 3px solid transparent; /* Move o detalhe para baixo */
+        font-size: 14px;
+    }
+
+    .sidebar ul li:hover, .sidebar ul li.active {
+        border-left: none;
+        border-bottom: 3px solid #facc15;
+    }
+
+    /* Ajusta os espaçamentos gerais */
+    .main-content {
+        padding: 15px;
+    }
+
+    h1 { font-size: 22px; }
+    h2 { font-size: 18px; }
+
+    /* Empilha os cards do Dashboard */
+    .cards {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    /* Salva a tela das tabelas criando um Scroll Horizontal apenas nelas */
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap; /* Garante que o texto da tabela não se esprema */
+        -webkit-overflow-scrolling: touch; /* Deixa o scroll suave no iPhone/Android */
+    }
+
+    /* Empilha os campos dos Formulários */
+    form {
+        flex-direction: column;
+        padding: 15px;
+        gap: 10px;
+    }
+
+    input, select, button {
+        width: 100%;
+        min-width: 100%;
+    }
+
+    /* Ajusta a Calculadora e os Filtros */
+    .filtros-container {
+        flex-direction: column;
+        padding: 15px;
+        gap: 10px;
+    }
+
+    .calc-container {
+        padding: 20px;
+    }
+
+    .input-group-row {
+        flex-direction: column;
+    }
+
+    .highlight-group {
+        border-left: none;
+        border-top: 4px solid #facc15;
+        border-radius: 8px;
+    }
+    
+    /* Ajusta o Modal (Avisos do Sistema) para não vazar da tela */
+    .sys-modal {
+        width: 95%;
+        padding: 20px;
+    }
+
+    .modal-buttons {
+        flex-direction: column;
+    }
+    
+    .btn-modal-cancel, .btn-modal-confirm {
+        width: 100%;
+    }
+}
