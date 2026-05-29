@@ -1,7 +1,23 @@
 // ==========================================
-// 1. NAVEGAÇÃO DE ABAS (Protegida)
-// Colocamos no topo para garantir que funcione
-// mesmo se o banco de dados falhar.
+// 1. CONFIGURAÇÃO DO SUPABASE (Corrigida)
+// ==========================================
+// ATENÇÃO: A URL não pode ter "/rest/v1/" no final. Foi corrigido abaixo.
+const SUPABASE_URL = "https://kfnvhqspzefdvfkgbawp.supabase.co"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmbnZocXNwemVmZHZma2diYXdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwMjE3MTcsImV4cCI6MjA5NTU5NzcxN30.JOWCOAszK1W3GOklrwhKUAy_lGbuX7WGmlwAdsIvBj8";
+
+// Mudamos o nome da variável para "meuBanco" para nunca mais dar o erro de "already been declared"
+var meuBanco = null;
+
+try {
+    if (window.supabase) {
+        meuBanco = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+} catch (erro) {
+    console.error("Erro ao iniciar o banco de dados:", erro);
+}
+
+// ==========================================
+// 2. NAVEGAÇÃO DE ABAS 
 // ==========================================
 window.showTab = function(tabId) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -10,39 +26,15 @@ window.showTab = function(tabId) {
     document.getElementById(tabId).classList.add('active');
     document.getElementById(`nav-${tabId}`).classList.add('active');
     
-    // Tenta puxar os dados, se a função existir
     if (typeof fetchData === 'function') {
         fetchData();
     }
 };
 
 // ==========================================
-// 2. CONFIGURAÇÃO DO SUPABASE (Com trava anti-crash)
-// ==========================================
-const SUPABASE_URL = "https://kfnvhqspzefdvfkgbawp.supabase.co/rest/v1/"; // Lembre-se de colocar o https://...
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmbnZocXNwemVmZHZma2diYXdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwMjE3MTcsImV4cCI6MjA5NTU5NzcxN30.JOWCOAszK1W3GOklrwhKUAy_lGbuX7WGmlwAdsIvBj8";
-
-let supabase = null;
-
-try {
-    // Só tenta conectar se a URL for válida (começar com http)
-    if (SUPABASE_URL.startsWith('http')) {
-        if (!window.supabaseClient && window.supabase) {
-            window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        }
-        supabase = window.supabaseClient;
-    } else {
-        console.warn("⚠️ Supabase não conectado: Insira uma URL válida começando com https://");
-    }
-} catch (erro) {
-    console.error("Erro ao iniciar o banco de dados:", erro);
-}
-
-
-// ==========================================
 // 3. LÓGICA DA CALCULADORA INTELIGENTE
 // ==========================================
-let insumos = []; 
+var insumos = []; 
 
 window.adicionarInsumo = function() {
     const nomeInput = document.getElementById('insumo-nome');
@@ -82,7 +74,7 @@ function atualizarListaInsumos() {
     });
 
     document.getElementById('calc-custo').value = custoTotal.toFixed(2);
-    calcularPreco(); 
+    window.calcularPreco(); 
 }
 
 window.calcularPreco = function() {
@@ -100,7 +92,7 @@ window.calcularPreco = function() {
 // ==========================================
 
 async function fetchData() {
-    if (!supabase) return; // Se não tiver banco configurado, ele para aqui e não quebra o site
+    if (!meuBanco) return; 
     await renderSelects();
     await renderTables();
     await renderDashboard();
@@ -109,10 +101,10 @@ async function fetchData() {
 // Cadastrar Funcionário
 document.getElementById('form-funcionario').addEventListener('submit', async function(e) {
     e.preventDefault();
-    if(!supabase) return alert("Configure as chaves do Supabase no app.js");
+    if(!meuBanco) return alert("Banco de dados não conectado.");
     const nome = document.getElementById('func-nome').value;
     
-    await supabase.from('funcionarios').insert([{ nome }]);
+    await meuBanco.from('funcionarios').insert([{ nome }]);
     this.reset();
     fetchData();
 });
@@ -120,13 +112,13 @@ document.getElementById('form-funcionario').addEventListener('submit', async fun
 // Cadastrar Produto
 document.getElementById('form-produto').addEventListener('submit', async function(e) {
     e.preventDefault();
-    if(!supabase) return alert("Configure as chaves do Supabase no app.js");
+    if(!meuBanco) return alert("Banco de dados não conectado.");
     const nome = document.getElementById('prod-nome').value;
     const qtd_estoque = parseInt(document.getElementById('prod-qtd').value);
     const custo_producao = parseFloat(document.getElementById('prod-custo').value);
     const preco_venda = parseFloat(document.getElementById('prod-preco').value);
 
-    await supabase.from('produtos').insert([{ nome, qtd_estoque, custo_producao, preco_venda }]);
+    await meuBanco.from('produtos').insert([{ nome, qtd_estoque, custo_producao, preco_venda }]);
     this.reset();
     fetchData();
 });
@@ -134,16 +126,16 @@ document.getElementById('form-produto').addEventListener('submit', async functio
 // Registrar Saída para a Rua
 document.getElementById('form-saida').addEventListener('submit', async function(e) {
     e.preventDefault();
-    if(!supabase) return alert("Configure as chaves do Supabase no app.js");
+    if(!meuBanco) return alert("Banco de dados não conectado.");
     const produto_id = parseInt(document.getElementById('saida-produto').value);
     const funcionario_id = parseInt(document.getElementById('saida-func').value);
     const qtd = parseInt(document.getElementById('saida-qtd').value);
 
-    let { data: prod } = await supabase.from('produtos').select('qtd_estoque').eq('id', produto_id).single();
+    let { data: prod } = await meuBanco.from('produtos').select('qtd_estoque').eq('id', produto_id).single();
     if (prod.qtd_estoque < qtd) return alert('Estoque interno insuficiente!');
 
-    await supabase.from('produtos').update({ qtd_estoque: prod.qtd_estoque - qtd }).eq('id', produto_id);
-    await supabase.from('saidas').insert([{ produto_id, funcionario_id, qtd_inicial: qtd, qtd_restante: qtd }]);
+    await meuBanco.from('produtos').update({ qtd_estoque: prod.qtd_estoque - qtd }).eq('id', produto_id);
+    await meuBanco.from('saidas').insert([{ produto_id, funcionario_id, qtd_inicial: qtd, qtd_restante: qtd }]);
     
     this.reset();
     fetchData();
@@ -152,19 +144,19 @@ document.getElementById('form-saida').addEventListener('submit', async function(
 // Registrar Venda
 document.getElementById('form-venda').addEventListener('submit', async function(e) {
     e.preventDefault();
-    if(!supabase) return alert("Configure as chaves do Supabase no app.js");
+    if(!meuBanco) return alert("Banco de dados não conectado.");
     const saida_id = parseInt(document.getElementById('venda-saida').value);
     const qtd = parseInt(document.getElementById('venda-qtd').value);
     const cliente = document.getElementById('venda-cliente').value;
     const status = document.getElementById('venda-status').value;
 
-    let { data: saida } = await supabase.from('saidas').select('*, produtos(preco_venda)').eq('id', saida_id).single();
+    let { data: saida } = await meuBanco.from('saidas').select('*, produtos(preco_venda)').eq('id', saida_id).single();
     if (saida.qtd_restante < qtd) return alert('O funcionário não tem essa quantidade na rua!');
 
     const total = qtd * saida.produtos.preco_venda;
 
-    await supabase.from('saidas').update({ qtd_restante: saida.qtd_restante - qtd }).eq('id', saida_id);
-    await supabase.from('vendas').insert([{ saida_id, qtd, cliente, total, status }]);
+    await meuBanco.from('saidas').update({ qtd_restante: saida.qtd_restante - qtd }).eq('id', saida_id);
+    await meuBanco.from('vendas').insert([{ saida_id, qtd, cliente, total, status }]);
 
     this.reset();
     fetchData();
@@ -172,8 +164,8 @@ document.getElementById('form-venda').addEventListener('submit', async function(
 
 // Dar Baixa
 window.darBaixa = async function(vendaId) {
-    if(!supabase) return;
-    await supabase.from('vendas').update({ status: 'Pago' }).eq('id', vendaId);
+    if(!meuBanco) return;
+    await meuBanco.from('vendas').update({ status: 'Pago' }).eq('id', vendaId);
     fetchData();
 };
 
@@ -183,9 +175,9 @@ window.darBaixa = async function(vendaId) {
 // ==========================================
 
 async function renderSelects() {
-    const { data: prods } = await supabase.from('produtos').select('*');
-    const { data: funcs } = await supabase.from('funcionarios').select('*');
-    const { data: saidas } = await supabase.from('saidas').select('*, produtos(nome), funcionarios(nome)').gt('qtd_restante', 0);
+    const { data: prods } = await meuBanco.from('produtos').select('*');
+    const { data: funcs } = await meuBanco.from('funcionarios').select('*');
+    const { data: saidas } = await meuBanco.from('saidas').select('*, produtos(nome), funcionarios(nome)').gt('qtd_restante', 0);
 
     const sProd = document.getElementById('saida-produto');
     sProd.innerHTML = '<option value="">Selecione o Produto...</option>';
@@ -201,22 +193,22 @@ async function renderSelects() {
 }
 
 async function renderTables() {
-    const { data: funcs } = await supabase.from('funcionarios').select('*');
+    const { data: funcs } = await meuBanco.from('funcionarios').select('*');
     const tFunc = document.querySelector('#table-funcionarios tbody');
     tFunc.innerHTML = '';
     if(funcs) funcs.forEach(f => tFunc.innerHTML += `<tr><td>${f.id}</td><td>${f.nome}</td></tr>`);
 
-    const { data: prods } = await supabase.from('produtos').select('*');
+    const { data: prods } = await meuBanco.from('produtos').select('*');
     const tProd = document.querySelector('#table-produtos tbody');
     tProd.innerHTML = '';
     if(prods) prods.forEach(p => tProd.innerHTML += `<tr><td>${p.nome}</td><td>${p.qtd_estoque}</td><td>R$ ${p.custo_producao.toFixed(2)}</td><td>R$ ${p.preco_venda.toFixed(2)}</td></tr>`);
 
-    const { data: saidas } = await supabase.from('saidas').select('*, produtos(nome), funcionarios(nome)');
+    const { data: saidas } = await meuBanco.from('saidas').select('*, produtos(nome), funcionarios(nome)');
     const tSaidas = document.querySelector('#table-saidas tbody');
     tSaidas.innerHTML = '';
     if(saidas) saidas.forEach(s => tSaidas.innerHTML += `<tr><td>${s.funcionarios?.nome || 'N/A'}</td><td>${s.produtos?.nome || 'N/A'}</td><td>${s.qtd_inicial}</td><td>${s.qtd_restante}</td></tr>`);
 
-    const { data: vendas } = await supabase.from('vendas').select('*, saidas(produtos(nome), funcionarios(nome))');
+    const { data: vendas } = await meuBanco.from('vendas').select('*, saidas(produtos(nome), funcionarios(nome))');
     const tVendas = document.querySelector('#table-vendas tbody');
     tVendas.innerHTML = '';
     if(vendas) {
@@ -240,9 +232,9 @@ async function renderTables() {
 }
 
 async function renderDashboard() {
-    const { data: prods } = await supabase.from('produtos').select('*');
-    const { data: saidas } = await supabase.from('saidas').select('*, funcionarios(nome), produtos(nome)');
-    const { data: vendas } = await supabase.from('vendas').select('*, saidas(produtos(custo_producao))');
+    const { data: prods } = await meuBanco.from('produtos').select('*');
+    const { data: saidas } = await meuBanco.from('saidas').select('*, funcionarios(nome), produtos(nome)');
+    const { data: vendas } = await meuBanco.from('vendas').select('*, saidas(produtos(custo_producao))');
 
     let totalEstoque = prods ? prods.reduce((acc, p) => acc + p.qtd_estoque, 0) : 0;
     let totalNaRua = saidas ? saidas.reduce((acc, s) => acc + s.qtd_restante, 0) : 0;
@@ -274,5 +266,5 @@ async function renderDashboard() {
     }
 }
 
-// Inicializa a coleta de dados apenas se o banco estiver ok
-if(supabase) fetchData();
+// Inicializa a coleta de dados
+if(meuBanco) fetchData();
