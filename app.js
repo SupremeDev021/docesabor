@@ -190,7 +190,6 @@ document.getElementById('form-cliente').addEventListener('submit', async functio
     e.preventDefault();
     if(!meuBanco) { await SysModal.alert("Banco de dados não conectado."); return; }
     const nome = document.getElementById('cli-nome').value;
-    // Pega o telefone ou envia um texto vazio
     const telefone = document.getElementById('cli-telefone').value || ""; 
 
     await meuBanco.from('clientes').insert([{ nome, telefone }]);
@@ -293,6 +292,21 @@ window.excluirCliente = async function(id) {
     }
 };
 
+window.editarCliente = async function(id, nomeAtual, telefoneAtual) {
+    let novoNome = await SysModal.prompt("Editar Nome do Cliente:", nomeAtual);
+    if (novoNome === null) return; 
+
+    let novoTel = await SysModal.prompt("Editar WhatsApp (Deixe vazio se não tiver):", telefoneAtual || "");
+    if (novoTel === null) return; 
+
+    if (novoNome.trim() !== "") {
+        await meuBanco.from('clientes').update({ nome: novoNome.trim(), telefone: novoTel.trim() }).eq('id', id);
+        fetchData();
+    } else {
+        await SysModal.alert("O nome do cliente não pode ficar vazio!");
+    }
+};
+
 // ==========================================
 // 6. ATUALIZAÇÃO VISUAL (Tabelas e Dashboard)
 // ==========================================
@@ -313,7 +327,10 @@ async function renderSelects() {
 
     const sCli = document.getElementById('venda-cliente');
     sCli.innerHTML = '<option value="">Selecione o Cliente...</option>';
-    if(clientes) clientes.forEach(c => sCli.innerHTML += `<option value="${c.nome}">${c.nome} (${c.telefone})</option>`);
+    if(clientes) clientes.forEach(c => {
+        const exibeTel = c.telefone ? ` (${c.telefone})` : '';
+        sCli.innerHTML += `<option value="${c.nome}">${c.nome}${exibeTel}</option>`;
+    });
 
     const sVenda = document.getElementById('venda-saida');
     sVenda.innerHTML = '<option value="">Selecione quem está vendendo...</option>';
@@ -330,7 +347,23 @@ async function renderTables() {
     const tCli = document.querySelector('#table-clientes tbody');
     if(tCli) {
         tCli.innerHTML = '';
-        if(clientes) clientes.forEach(c => tCli.innerHTML += `<tr><td>${c.nome}</td><td>${c.telefone}</td><td><button class="btn-acao btn-excluir" onclick="window.excluirCliente(${c.id})">Excluir</button></td></tr>`);
+        if(clientes) {
+            clientes.forEach(c => {
+                const telExibicao = c.telefone ? c.telefone : '<span style="color: #94a3b8; font-size: 12px; font-style: italic;">Sem número</span>';
+                const nomeSeguro = c.nome.replace(/'/g, "\\'");
+                const telSeguro = (c.telefone || '').replace(/'/g, "\\'");
+
+                tCli.innerHTML += `
+                    <tr>
+                        <td>${c.nome}</td>
+                        <td>${telExibicao}</td>
+                        <td>
+                            <button class="btn-acao btn-editar" onclick="window.editarCliente(${c.id}, '${nomeSeguro}', '${telSeguro}')">Editar</button>
+                            <button class="btn-acao btn-excluir" onclick="window.excluirCliente(${c.id})">Excluir</button>
+                        </td>
+                    </tr>`;
+            });
+        }
     }
 
     const { data: prods } = await meuBanco.from('produtos').select('*').order('nome', { ascending: true });
@@ -447,4 +480,5 @@ async function renderDashboard() {
     }
 }
 
+// Inicializa a coleta de dados
 if(meuBanco) fetchData();
