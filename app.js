@@ -78,24 +78,43 @@ function atualizarListaInsumos() {
 }
 
 window.calcularPreco = function() {
-    // 1. Pega os valores da tela
+    // 1. Pega os valores de custo e rendimento
     const custoTotal = parseFloat(document.getElementById('calc-custo').value) || 0;
     const rendimento = parseInt(document.getElementById('calc-rendimento').value) || 1;
+    
+    // 2. Pega as porcentagens da tela (Sem impostos)
+    const despesas = parseFloat(document.getElementById('calc-despesas').value) || 0;
     const margem = parseFloat(document.getElementById('calc-margem').value) || 0;
     
-    // 2. Impede divisão por zero se o usuário apagar o campo
+    // 3. Descobre o custo unitário (Custo / Rendimento)
     const qtdValida = rendimento > 0 ? rendimento : 1;
-
-    // 3. Descobre o custo de apenas 1 unidade
     const custoUnitario = custoTotal / qtdValida;
     
-    // 4. Aplica a margem de lucro em cima da unidade
-    const precoSugerido = custoUnitario + (custoUnitario * (margem / 100));
+    // 4. PASSO 1: Soma as porcentagens (Apenas Despesas + Lucro)
+    const somaPorcentagens = despesas + margem;
+
+    let precoSugerido = 0;
+
+    // Trava de segurança matemática do Markup
+    if (somaPorcentagens >= 100) {
+        document.getElementById('calc-resultado').innerText = "Erro: % >= 100";
+        return; // Interrompe o cálculo
+    } 
     
-    // 5. Mostra na tela
+    // Se a soma for zero, o preço é apenas o custo unitário
+    if (somaPorcentagens === 0) {
+        precoSugerido = custoUnitario;
+    } else {
+        // PASSO 2: Aplica na fórmula do índice de Markup
+        const indice = 100 / (100 - somaPorcentagens);
+        
+        // PASSO 3: Multiplica o custo pelo índice
+        precoSugerido = custoUnitario * indice;
+    }
+    
+    // 5. Exibe na tela formatado
     document.getElementById('calc-resultado').innerText = `R$ ${precoSugerido.toFixed(2)}`;
 };
-
 // ==========================================
 // 4. FLUXOS DO BANCO DE DADOS (SUPABASE)
 // ==========================================
