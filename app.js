@@ -19,8 +19,8 @@ window.showTab = function(tabId) {
 // ==========================================
 // 2. CONFIGURAÇÃO DO SUPABASE (Com trava anti-crash)
 // ==========================================
-const SUPABASE_URL = "SUA_URL_AQUI"; // Lembre-se de colocar o https://...
-const SUPABASE_ANON_KEY = "SUA_CHAVE_AQUI";
+const SUPABASE_URL = "https://supabase.com/dashboard/project/kfnvhqspzefdvfkgbawp"; // Lembre-se de colocar o https://...
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmbnZocXNwemVmZHZma2diYXdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwMjE3MTcsImV4cCI6MjA5NTU5NzcxN30.JOWCOAszK1W3GOklrwhKUAy_lGbuX7WGmlwAdsIvBj8";
 
 let supabase = null;
 
