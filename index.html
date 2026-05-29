@@ -13,6 +13,7 @@
         <ul>
             <li onclick="window.showTab('dashboard')" class="active" id="nav-dashboard">Dashboard</li>
             <li onclick="window.showTab('funcionarios')" id="nav-funcionarios">Funcionários</li>
+            <li onclick="window.showTab('clientes')" id="nav-clientes">Clientes</li>
             <li onclick="window.showTab('produtos')" id="nav-produtos">Produtos</li>
             <li onclick="window.showTab('precificacao')" id="nav-precificacao">Calculadora %</li>
             <li onclick="window.showTab('saidas')" id="nav-saidas">Saídas p/ Rua</li>
@@ -82,12 +83,32 @@
             </table>
         </div>
 
+        <div id="clientes" class="tab-content">
+            <h1>Cadastrar Cliente (Base p/ Automação)</h1>
+            <form id="form-cliente">
+                <input type="text" id="cli-nome" placeholder="Nome do Cliente" required>
+                <input type="text" id="cli-telefone" placeholder="WhatsApp (Ex: 5521999999999)" required>
+                <button type="submit">Salvar Cliente</button>
+            </form>
+            <h2>Base de Clientes</h2>
+            <table id="table-clientes">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>WhatsApp</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
         <div id="produtos" class="tab-content">
             <h1>Cadastrar Produto</h1>
             <form id="form-produto">
                 <input type="text" id="prod-nome" placeholder="Nome do Produto" required>
                 <input type="number" id="prod-qtd" placeholder="Quantidade em Estoque" required>
-                <input type="number" id="prod-custo" placeholder="Custo de Produção (R$)" step="0.01" required>
+                <input type="number" id="prod-custo" placeholder="Custo UNITÁRIO (de 1 un.)" step="0.01" required>
                 <input type="number" id="prod-preco" placeholder="Preço de Venda (R$)" step="0.01" required>
                 <button type="submit">Salvar Produto</button>
             </form>
@@ -176,7 +197,7 @@
             <form id="form-venda">
                 <select id="venda-saida" required><option value="">Selecione o Funcionário e o Produto...</option></select>
                 <input type="number" id="venda-qtd" placeholder="Quantidade Vendida" required>
-                <input type="text" id="venda-cliente" placeholder="Nome do Cliente" required>
+                <select id="venda-cliente" required><option value="">Selecione o Cliente...</option></select>
                 <select id="venda-status" required>
                     <option value="Pendente">Pendente</option>
                     <option value="Pago">Pago</option>
@@ -210,6 +231,18 @@
                 </thead>
                 <tbody></tbody>
             </table>
+        </div>
+    </div>
+
+    <div id="sys-modal-overlay" class="modal-overlay">
+        <div class="sys-modal">
+            <h3 id="sys-modal-title">Aviso</h3>
+            <p id="sys-modal-message">Mensagem</p>
+            <input type="text" id="sys-modal-input" class="modal-input" style="display: none;">
+            <div class="modal-buttons">
+                <button id="sys-modal-btn-cancel" class="btn-modal-cancel" style="display: none;">Cancelar</button>
+                <button id="sys-modal-btn-confirm" class="btn-modal-confirm">OK</button>
+            </div>
         </div>
     </div>
 
