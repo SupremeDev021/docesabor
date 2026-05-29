@@ -107,6 +107,9 @@
         
         <div class="insumos-area">
             <h3>Custos / Insumos Usados</h3>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">
+                Adicione os itens um por um abaixo <strong>OU</strong> digite o valor final direto no campo "Custo TOTAL".
+            </p>
             <div class="input-group-row">
                 <input type="text" id="insumo-nome" placeholder="Ex: Embalagem, Matéria-prima...">
                 <input type="number" id="insumo-valor" placeholder="Valor (R$)" step="0.01">
@@ -117,7 +120,7 @@
 
         <div class="input-group">
             <label>Custo de Produção TOTAL (R$)</label>
-            <input type="number" id="calc-custo" value="0.00" readonly>
+            <input type="number" id="calc-custo" placeholder="Ex: 15.00" oninput="window.calcularPreco()">
         </div>
 
         <div class="input-group" style="border-left: 4px solid #38bdf8; padding-left: 10px; margin-top: 15px;">
@@ -126,8 +129,13 @@
         </div>
 
         <div class="input-group" style="margin-top: 15px;">
+            <label>Despesas Fixas (%)</label>
+            <input type="number" id="calc-despesas" placeholder="Ex: 10" value="0" oninput="window.calcularPreco()">
+        </div>
+
+        <div class="input-group" style="margin-top: 15px;">
             <label>Margem de Lucro Desejada (%)</label>
-            <input type="number" id="calc-margem" placeholder="Ex: 100" oninput="window.calcularPreco()">
+            <input type="number" id="calc-margem" placeholder="Ex: 25" value="0" oninput="window.calcularPreco()">
         </div>
 
         <div class="result-box">
@@ -136,7 +144,6 @@
         </div>
     </div>
 </div>
-
         <div id="saidas" class="tab-content">
             <h1>Registrar Saída para a Rua</h1>
             <form id="form-saida">
