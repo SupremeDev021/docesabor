@@ -184,3 +184,57 @@ th {
     text-align: center;
     border: 1px dashed #4ade80;
 }
+
+/* Estilos extras para a nova Calculadora */
+.insumos-area {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.input-group-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.input-group-row input {
+    flex: 1;
+    min-width: 100px;
+}
+
+.input-group-row button {
+    background-color: #f59e0b;
+}
+
+.input-group-row button:hover {
+    background-color: #d97706;
+}
+
+.lista-insumos {
+    list-style: none;
+    background: #f8fafc;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.lista-insumos li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 14px;
+    color: #475569;
+}
+
+.lista-insumos li:last-child {
+    border-bottom: none;
+}
+
+.btn-remover {
+    color: #ef4444;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 15px;
+}
