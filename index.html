@@ -83,11 +83,13 @@
             </table>
         </div>
 
+       <!-- CLIENTES -->
         <div id="clientes" class="tab-content">
             <h1>Cadastrar Cliente (Base p/ Automação)</h1>
             <form id="form-cliente">
                 <input type="text" id="cli-nome" placeholder="Nome do Cliente" required>
-                <input type="text" id="cli-telefone" placeholder="WhatsApp (Ex: 5521999999999)" required>
+                <!-- Removido o 'required' para tornar o WhatsApp opcional -->
+                <input type="text" id="cli-telefone" placeholder="WhatsApp (Opcional - Ex: 5521999999999)">
                 <button type="submit">Salvar Cliente</button>
             </form>
             <h2>Base de Clientes</h2>
@@ -96,7 +98,7 @@
                     <tr>
                         <th>Nome</th>
                         <th>WhatsApp</th>
-                        <th>Ação</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
