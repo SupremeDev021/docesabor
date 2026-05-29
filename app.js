@@ -293,16 +293,23 @@ window.excluirCliente = async function(id) {
 };
 
 window.editarCliente = async function(id, nomeAtual, telefoneAtual) {
+    // 1. Pergunta o novo nome
     let novoNome = await SysModal.prompt("Editar Nome do Cliente:", nomeAtual);
     if (novoNome === null) return; 
 
+    // PAUSA DE 400ms PARA A ANIMAÇÃO DO MODAL FECHAR ANTES DE ABRIR O PRÓXIMO
+    await new Promise(resolve => setTimeout(resolve, 400));
+
+    // 2. Pergunta o novo telefone
     let novoTel = await SysModal.prompt("Editar WhatsApp (Deixe vazio se não tiver):", telefoneAtual || "");
     if (novoTel === null) return; 
 
+    // 3. Atualiza no banco
     if (novoNome.trim() !== "") {
         await meuBanco.from('clientes').update({ nome: novoNome.trim(), telefone: novoTel.trim() }).eq('id', id);
         fetchData();
     } else {
+        await new Promise(resolve => setTimeout(resolve, 400));
         await SysModal.alert("O nome do cliente não pode ficar vazio!");
     }
 };
